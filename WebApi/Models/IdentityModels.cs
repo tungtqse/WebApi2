@@ -21,7 +21,7 @@ namespace WebApi.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("WAConnection", throwIfV1Schema: false)
+            : base("MainContext", throwIfV1Schema: false)
         {
         }
         
