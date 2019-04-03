@@ -21,10 +21,18 @@ namespace WebApi.ApplicationAPI.APIs.Product
             public string Name { get; set; }
         }
 
-        public class Result : ISearchResult<NestedModel.ProductModel>
+        public class Result : ISearchResult<NestedModel.ProductModel>, IWebApiResponse
         {
             public IList<NestedModel.ProductModel> SearchResultItems { get; set; }
             public int Count { get; set; }
+            public Result()
+            {
+                Messages = new List<string>();
+            }
+
+            public int Code { get; set; }
+            public bool IsSuccessful { get; set; }
+            public List<string> Messages { get; set; }
         }
 
         public class NestedModel

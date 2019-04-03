@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using WebApi.Common;
 
 namespace WebApi.Controllers
 {
@@ -19,16 +20,74 @@ namespace WebApi.Controllers
         }
 
         // POST api/values
-        public IHttpActionResult Post([FromBody]  ApplicationAPI.APIs.Product.CreateApi.Command command)
+        [HttpPost]
+        public IHttpActionResult Create([FromBody] ApplicationAPI.APIs.Product.CreateApi.Command command)
         {
             try
             {
                 var model = _mediator.Send(command);
-                return Ok();           
+                return Json(model);           
             }
             catch (Exception e)
             {
-                var response = e.Message;
+                var response = new ApplicationAPI.APIs.Product.CreateApi.CommandResponse();
+                response.Messages.Add(Constant.CommonError);
+                response.Messages.Add(e.Message);
+                response.Code = 500;
+                return Json(response);
+            }
+        }
+
+        // PUT api/values/5
+        [HttpPut]
+        public IHttpActionResult Edit([FromBody] ApplicationAPI.APIs.Product.UpdateApi.Command command)
+        {
+            try
+            {
+                var model = _mediator.Send(command);
+                return Json(model);
+            }
+            catch (Exception e)
+            {
+                var response = new ApplicationAPI.APIs.Product.UpdateApi.CommandResponse();
+                response.Messages.Add(Constant.CommonError);
+                response.Messages.Add(e.Message);
+                response.Code = 500;
+                return Json(response);
+            }
+        }
+
+        public IHttpActionResult Get(Guid id)
+        {
+            try
+            {
+                var model = _mediator.Send(new ApplicationAPI.APIs.Product.GetDetailApi.Query() { Id = id});
+                return Json(model);
+            }
+            catch (Exception e)
+            {
+                var response = new ApplicationAPI.APIs.Product.GetDetailApi.Result();
+                response.Messages.Add(Constant.CommonError);
+                response.Messages.Add(e.Message);
+                response.Code = 500;
+                return Json(response);
+            }
+        }
+
+        [HttpPost]
+        public IHttpActionResult Search([FromBody] ApplicationAPI.APIs.Product.SearchApi.Query command)
+        {
+            try
+            {
+                var model = _mediator.Send(command);
+                return Json(model);
+            }
+            catch (Exception e)
+            {
+                var response = new ApplicationAPI.APIs.Product.SearchApi.Result();
+                response.Messages.Add(Constant.CommonError);
+                response.Messages.Add(e.Message);
+                response.Code = 500;
                 return Json(response);
             }
         }

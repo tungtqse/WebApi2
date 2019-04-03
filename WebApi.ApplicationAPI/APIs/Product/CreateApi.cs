@@ -7,15 +7,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApi.Core.Helper;
+using WebApi.Core.Models;
 using WebApi.Core.UnitOfWork;
 
 namespace WebApi.ApplicationAPI.APIs.Product
 {
     public class CreateApi
     {
-        public class Command : IRequest
+        public class Command : IRequest<CommandResponse>
         {
             public NestedModel.ProductModel ProductModel { get; set; }
+        }
+
+        public class CommandResponse : IWebApiResponse
+        {
+            public CommandResponse()
+            {
+                Messages = new List<string>();
+            }
+
+            public int Code { get; set; }
+            public bool IsSuccessful { get; set; }
+            public List<string> Messages { get; set; }
         }
 
         public class NestedModel
@@ -53,7 +66,7 @@ namespace WebApi.ApplicationAPI.APIs.Product
 
         #region CommandHandler
 
-        public class CommandHandler : IRequestHandler<Command>
+        public class CommandHandler : IRequestHandler<Command, CommandResponse>
         {
             private readonly IUnitOfWorkFactory<UnitOfWork> _unitOfWork;
             private readonly IMediator _mediator;
@@ -66,8 +79,10 @@ namespace WebApi.ApplicationAPI.APIs.Product
                 _validatorFactory = validatorFactory;
             }
 
-            public void Handle(Command message)
+            public CommandResponse Handle(Command message)
             {
+                var result = new CommandResponse();
+
                 using (var unit = _unitOfWork.Create())
                 {
                     // Validate
@@ -77,8 +92,8 @@ namespace WebApi.ApplicationAPI.APIs.Product
 
                     if (!validationResult.IsValid)
                     {
-                        var remark = string.Join(";",
-                            validationResult.Errors.Select(s => s.ErrorMessage).Distinct().ToList());
+                        result.Code = 400; 
+                        result.Messages.AddRange(validationResult.Errors.Select(s => s.ErrorMessage).Distinct().ToList());
                     }
                     else
                     {
@@ -92,8 +107,14 @@ namespace WebApi.ApplicationAPI.APIs.Product
                         unit.Repository<DataAccess.Model.Product>().Add(product);
 
                         unit.SaveChanges();
-                    }
+
+                        result.Code = 201;
+                        result.IsSuccessful = true;
+                        result.Messages.Add("Product is added");
+                    }                    
                 }
+
+                return result;
             }
         }
 

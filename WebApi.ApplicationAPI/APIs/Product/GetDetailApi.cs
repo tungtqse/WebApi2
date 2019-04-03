@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApi.Common;
+using WebApi.Core.Models;
 using WebApi.Core.UnitOfWork;
 
 namespace WebApi.ApplicationAPI.APIs.Product
@@ -18,19 +19,37 @@ namespace WebApi.ApplicationAPI.APIs.Product
             public Guid Id { get; set; }
         }
 
-        public class Result
+        public class Result : IWebApiResponse
         {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string ShortDescription { get; set; }
-            public double? Duration { get; set; }
+            public Result()
+            {
+                Messages = new List<string>();
+            }
+
+            public int Code { get; set; }
+            public bool IsSuccessful { get; set; }
+            public List<string> Messages { get; set; }
+
+            public NestedModel.ProductModel ProductModel { get; set; }
         }       
+
+        public class NestedModel
+        {
+            public class ProductModel
+            {
+                public Guid Id { get; set; }
+                public string Name { get; set; }
+                public string Description { get; set; }
+                public string ShortDescription { get; set; }
+                public double? Duration { get; set; }
+            }
+        }
 
         public class MappingProfile : Profile
         {
             public MappingProfile()
             {
-                CreateMap<DataAccess.Model.Product, Result>()
+                CreateMap<DataAccess.Model.Product, NestedModel.ProductModel>()
                     ;
             }
         }
@@ -52,9 +71,9 @@ namespace WebApi.ApplicationAPI.APIs.Product
                 {
                     var query =
                         unit.Repository<DataAccess.Model.Product>()
-                            .Where(w => w.Id == message.Id).ProjectTo<Result>();
+                            .Where(w => w.Id == message.Id).ProjectTo<NestedModel.ProductModel>();
 
-                    resultQuery = query.FirstOrDefault();
+                    resultQuery.ProductModel = query.FirstOrDefault();
 
                     return resultQuery;
                 }

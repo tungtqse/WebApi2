@@ -80,6 +80,7 @@
     <Compile Include="Infrastructure\ValidationResolver.cs" />
     <Compile Include="Models\ISearchResult.cs" />
     <Compile Include="Models\IValidationModel.cs" />
+    <Compile Include="Models\IWebApiResponse.cs" />
     <Compile Include="Models\KendoGridPagingModel.cs" />
     <Compile Include="Models\ModelContainer.cs" />
     <Compile Include="Models\UserProfileModel.cs" />

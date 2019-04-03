@@ -10,6 +10,7 @@ namespace WebApi.Common
     {
         public static Guid SystemId = Guid.NewGuid();
         public const string ConnectionString = "MainContext";
+        public const string CommonError = "An error occurred while processing your request.";
         public struct StatusId
         {
             public const string Active = "Active";
